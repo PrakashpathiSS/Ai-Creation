@@ -1,0 +1,836 @@
+Hugging Face - https://huggingface.co/models
+
+
+# AI Roadmap (After Python)
+
+# Once you're comfortable with Python, move to AI-specific topics in this order:
+
+# NumPy
+# Pandas
+# Matplotlib
+# Scikit-learn
+# Linear Algebra basics
+# Calculus basics
+# Probability & Statistics
+# PyTorch
+# Neural Networks
+# CNN
+# RNN / LSTM
+# Attention Mechanism
+# Transformers
+# GPT Architecture
+# Train your own small language model
+
+
+
+Basics of AI
+
+1.AI vs ML vs DL --------------------------------------------------------------
+
+Artificial Intelligence (AI)
+        │
+        └── Machine Learning (ML)
+                 │
+                 └── Deep Learning (DL)
+
+Artificial Intelligence:----------
+   -A broad field where machines solve problems intelligently.           
+Example:         
+   -Chess AI
+   -Rule-based chatbots
+
+Machine Learning:-------------
+   -The computer learns from data instead of following only hand-written rules.
+                 
+Example:     
+Photos of Cats 🐱
+    -↓
+    -Train
+    -↓
+    -Model
+    -↓
+    -Predict New Cat Images
+
+Deep Learning:----------------
+   -A branch of ML that uses neural networks.
+Examples:
+   -ChatGPT
+   -Image generation
+   -Speech recognition
+
+
+
+
+
+2.How AI Learns--------------------------------------------------------------
+Imagine teaching a child to recognize apples.
+
+🍎 Apple
+🍎 Apple
+🍎 Apple
+🍎 Apple
+
+After seeing many examples:
+
+🍎
+
+The child says:
+
+"That's an apple."
+
+AI works similarly.
+
+
+3.Data or Information --------------------------------------------------------------
+Text,Images,Number,Audio,Video,Letters ect.. All these are data or information.
+
+
+
+4. What is a Dataset?
+--------------------------------------------------------------
+
+A dataset is a collection of related data used to train, validate, or test an AI model.
+
+Examples:
+- A dataset of cat images.
+- A dataset of car images.
+- A dataset of numbers.
+- A dataset of handwritten letters.
+- A dataset of documents.
+- A dataset of emails.
+- A dataset of SMS messages.
+- A dataset of phone call recordings.
+- A dataset of customer information.
+- A dataset of weather data.
+
+Example Dataset:
+
+| Image      | Label |
+|------------|-------|
+| cat1.jpg   | Cat   |
+| cat2.jpg   | Cat   |
+| dog1.jpg   | Dog   |
+| dog2.jpg   | Dog   |
+
+Or
+
+| Age | Income | Purchased |
+|-----|--------|-----------|
+| 25  | 50000  | Yes       |
+| 30  | 70000  | No        |
+| 22  | 45000  | Yes       |
+
+
+
+5.Features and Labels --------------------------------------------------------------
+This is one of the most important AI concepts.
+Features are the input variables (properties or characteristics) used to make a prediction.
+
+Labels are the correct output (target) that the model learns to predict.
+
+Example 1: Predict House Price
+Features:
+- Area
+- Number of Bedrooms
+- Age of House
+
+Label:
+- House Price
+
+
+
+6.Model Training --------------------------------------------------------------
+A model is a mathematical representation of the relationship between features and labels.
+Training means teaching the model.
+Data
+   ↓
+Training
+   ↓
+Model Learns
+
+Example:-
+
+1000 Cat Images
+  ↓
+Training
+  ↓
+Model
+
+7.After Training --------------------------------------------------------------
+The model is now ready to make predictions.
+
+Example:-
+
+New Cat Image
+  ↓
+Prediction
+  ↓
+Predicted Cat Image
+
+
+8.Model Evaluation --------------------------------------------------------------
+After training, the model needs to be evaluated to see how well it performs.
+
+Example:-
+Dataset
+      ↓
+Training
+      ↓
+Model
+      ↓
+Prediction
+
+
+
+
+
+
+Modules Concepts --------------------------------------------------------------
+
+NumPy
+Pandas
+Matplotlib
+Scikit-learn
+Linear Algebra
+Calculus
+Probability & Statistics
+PyTorch
+Neural Networks
+CNN
+RNN / LSTM
+Attention Mechanism
+Transformers
+GPT Architecture
+Train Your Own Small Language Model
+
+AI Learning Roadmap - Quick Notes
+
+1.  NumPy
+
+-   Fast numerical computing library.
+-   Used for arrays, matrices, and mathematical operations.
+-   Think: Super-fast math for Python.
+
+2.  Pandas
+
+-   Library for working with tabular data.
+-   Used to read, clean, filter, and analyze CSV/Excel data.
+-   Think: Excel inside Python.
+
+3.  Matplotlib
+
+-   Library for creating charts and graphs.
+-   Used to visualize data.
+-   Think: Graph and chart generator.
+
+4.  Scikit-learn
+
+-   Machine Learning library.
+-   Provides ready-to-use ML algorithms such as classification,
+    regression, and clustering.
+-   Think: Machine Learning toolkit.
+
+5.  Linear Algebra
+
+-   Mathematics of vectors and matrices.
+-   Foundation of neural networks.
+-   Think: The language of AI mathematics.
+
+6.  Calculus
+
+-   Mathematics of change and optimization.
+-   Used to update model weights during training.
+-   Think: How AI learns from mistakes.
+
+7.  Probability & Statistics
+
+-   Mathematics of data and uncertainty.
+-   Includes mean, median, variance, probability, and distributions.
+-   Think: Understanding data.
+
+8.  PyTorch
+
+-   Deep Learning framework.
+-   Used to build and train neural networks.
+-   Think: Engine for building AI models.
+
+9.  Neural Networks
+
+-   Brain-inspired models that learn patterns from data.
+-   Think: The brain of AI.
+
+10. CNN (Convolutional Neural Network)
+
+-   Neural network designed for image processing.
+-   Used for image classification and object detection.
+-   Think: AI for images.
+
+11. RNN / LSTM
+
+-   Neural networks for sequential data.
+-   Used for text, speech, and time-series data.
+-   Think: AI with memory.
+
+12. Attention Mechanism
+
+-   Helps the model focus on the most important parts of the input.
+-   Think: AI learns what to pay attention to.
+
+13. Transformers
+
+-   Modern neural network architecture based on attention.
+-   Used in ChatGPT, translation, summarization, and code generation.
+-   Think: Foundation of modern AI.
+
+14. GPT Architecture
+
+-   Generative Pre-trained Transformer.
+-   A Transformer model trained to generate human-like text.
+-   Think: AI text generator.
+
+15. Train Your Own Small Language Model Steps:
+
+-   Collect Data
+-   Clean Data
+-   Tokenize
+-   Train the Model
+-   Save the Model
+-   Generate Text
+
+Think: Teaching a computer to understand and generate language.
+
+Roadmap: Python ↓ NumPy ↓ Pandas ↓ Matplotlib ↓ Scikit-learn ↓ Linear
+Algebra ↓ Calculus ↓ Probability & Statistics ↓ PyTorch ↓ Neural
+Networks ↓ CNN ↓ RNN / LSTM ↓ Attention Mechanism ↓ Transformers ↓ GPT
+Architecture ↓ Train Your Own Small Language Model
+
+
+
+1. Model Training ————————————————————————————————
+
+Data & Dataset
+Tokenizer
+Tokens & Embeddings
+Nural Network (Model)
+Weights & Bias
+Forward Pass
+Loss Function
+Backpropagation
+Optimizer
+Learning Rate
+Batch
+Epoch
+Training
+Validation
+Testing
+Inference
+Fine-tuning
+Transformer
+Large Language Model (LLM)
+
+
+
+1.Data 
+ Data is the information used to teach an AI.
+ example:- Apple → Fruit , Dog → Animal , Car → Vehicle
+
+
+
+
+2.Dataset
+ Dataset is the collection of Data.
+ example:- collection of datas like 
+
+ Fruit -> many varieties of fruit
+ Animal -> many varieties of animal
+ Vehicle -> many varieties of vehicle
+
+
+
+
+3.Tokenizer
+ Tokenizer is the function that converts text to numbers.
+ example:- 
+   like split the text into words and convert them to numbers
+   I love AI -> ["I","love","AI"] -> [15,234,98] ai  is not identify the word but it identify the numbers.
+
+
+
+
+4.Tokens & Embeddings
+------Tokens:------
+Think of it as: A LEGO brick of a sentence.
+ A token is a small piece of text produced by the tokenizer.
+ example:-
+ Sentence:
+ I love AI
+ 
+ Tokens:
+ ["I", "love", "AI"]
+
+
+ -----Embeddings:------
+ An embedding converts each token ID into a vector (a list of decimal numbers) that captures its meaning.
+ example:-
+ Text
+ "I love AI"
+ 
+         ↓
+ Tokenizer
+ 
+ ["I", "love", "AI"]
+ 
+         ↓
+ 
+ [15, 234, 98]        ← Token IDs
+ 
+         ↓
+ 
+ [
+  [0.21, -0.45, 0.88, ...],
+  [0.73,  0.11, 0.42, ...],
+  [-0.19, 0.67, 0.54, ...]
+ ]                     ← Embeddings
+
+
+The AI doesn't work directly with token IDs. It first converts them into embeddings,
+because embeddings contain semantic meaning (relationships between words).
+Easy Way to Remember
+| Concept       | Input    | Output                      |
+| ------------- | -------- | --------------------------- |
+| **Tokenizer** | Text     | Tokens + Token IDs "I love AI" -> ["I", "love", "AI"] -> [15, 234, 98]          |
+| **Token**     | Text     | Small pieces of text "I love AI" + ["I", "love", "AI"]        |
+| **Token ID**  | Token    | Integer (e.g., 15, 234, 98) "I" -> 15, "love" -> 234, "AI" -> 98 |
+| **Embedding** | Token ID | Vector of decimal numbers [0.21, -0.45, 0.88, ...], [0.73,  0.11, 0.42, ...], [-0.19, 0.67, 0.54, ...] 
+
+
+
+
+
+5.Neural Network (This is theModel)
+Neural Network is the model that learns the relationship between the input and output.
+
+example real time:-
+A neural network is the AI's brain.
+
+Data Feeding:-
+ user input text is  = "I love AI"
+ ↓
+ Tokenizer = ["I", "love", "AI"] split the text into words and convert them to numbers
+ ↓
+ Token IDs = [15, 234, 98] Tokenizer convert the text to token ids
+ ↓
+ Embeddings = [0.21, -0.45, 0.88, ...], [0.73,  0.11, 0.42, ...], [-0.19, 0.67, 0.54, ...] Embeddings are create the vector of the token ids
+ ↓
+ Prediction = "I love AI" prediction is the output of the model based on the embeddings
+
+Output:-
+This is incorrect because the model's output should be a new prediction, not simply repeat the input.
+
+Input: "I love"
+Prediction: "AI"
+
+or
+
+Input: "I love AI"
+Prediction: "because it helps people."
+
+
+
+
+
+
+6.Layer
+
+A layer is one level inside a neural network. Each layer processes the input and passes it to the next layer.
+Think of it as: A factory assembly line.
+
+Example:-
+"I love AI"
+
+Input Layer:- 
+"I love AI"
+ ↓
+Layer 1 -Hidden Layer
+Understands individual words.
+  ↓
+Layer 2 -Hidden Layer
+Understands the relationship between the words.
+  ↓
+Layer 3 -hidden layer
+Understands the meaning of the sentence.
+  ↓
+Output Layer:- Positive sentence.
+
+A Layer is a processing stage in a neural network that learns different patterns from the input before passing it to the next layer.
+
+
+
+
+
+
+7.Neuron
+ A Neuron is a single processing unit inside a layer. It takes the input, processes it, and passes it to the next neuron.
+ Think of it as: A single brain cell.
+
+ Example:-
+ "I love AI"
+
+ Input Neuron:-
+ "I love AI"
+ ↓
+ Neuron 1
+ ↓
+ Neuron 2
+ ↓
+ Neuron 3
+ ↓
+ Output Neuron:-
+ "I love AI"
+ ↓
+ Output Neuron:-
+ "I love AI"
+
+
+
+
+8.Weights 
+Weights are the values that are used to make the prediction more accurate.
+Inside the neural network there are millions (or billions) of weights 
+Weight → Decides how important the input is.
+
+example:-
+User Input: "Prakashpathi"
+  ↓
+Weights:
+[0.1, 0.4, 0.7, 1.0]
+  ↓
+P              → 0.1
+Prak           → 0.4
+Prakash        → 0.7
+Prakashpathi   → 1.0
+ ↓
+ Prediction: "Prakashpathi"
+
+ "I"    → Less useful for predicting the next word.
+ "love" → Gives sentiment (positive feeling).
+ "AI"   → Tells what the sentence is about.
+
+
+
+
+9.Bias
+Bias → Makes a small adjustment to the final prediction.
+Bias is the additional value added to the Weights to make the prediction more accurate.
+
+Example:-
+Output = Input × Weight + Bias
+
+User Input:
+"I love AI"
+        ↓
+Neural Network
+        ↓
+Weights:
+"I"    → 0.2
+"love" → 0.8
+"AI"   → 1.0
+        ↓
+Bias: 0.3 
++0.3
+        ↓
+Prediction: "I love AI because it helps people."
+
+
+-----Relationship Between Forward Pass and Loss Function with Weights and Bias------
+10.Forward Pass:-
+Forward Pass is the process where the neural network uses the input, weights, and bias to make a prediction.
+
+Example:-
+User Input:
+"What is 2 + 2?"
+        ↓
+Neural Network
+        ↓
+Prediction: "5"
+
+
+
+
+11.Loss Function:-
+Loss Function measures how wrong the prediction is by comparing it with the correct answer.
+
+Example:-
+Correct Answer:
+4
+Prediction:
+5
+        ↓
+Loss Function
+        ↓
+Error = 1
+The AI now knows it made a mistake.
+---------------------------------------------------------------
+
+13.Backpropagation:-
+Backpropagation finds where the AI made a mistake and sends the error backward/Reverse through the network.
+
+Example:- (It tells every layer how to improve.)
+
+Input - Input Layer
+↓
+Layer 1 - Hidden Layer
+↓
+Layer 2 - Hidden Layer
+↓
+Output (Wrong) - Output Layer
+↑ - Backward Pass
+Error goes backward through the network.
+
+Example after Backpropagation (optimizer updates the weights and bias to reduce the error):-
+Wrong Output
+↓
+Reverse
+↓
+Layer2
+↓
+Layer1
+↓
+Fix Error - Fix the error in the network.
+
+14.Optimizer:-
+An Optimizer updates the weights and bias to reduce the error and make future predictions more accurate.
+like a Teacher to improve the student's performance.
+
+Example:-
+Question:
+2 + 2 = ?
+        ↓
+Prediction:
+5
+        ↓
+Loss Function:
+Error = 1
+        ↓
+Optimizer:
+Updates the weights and bias
+        ↓
+Next Prediction:
+4 ✓
+
+
+Easy way to remember
+1.Forward Pass → Makes a prediction.
+2.Loss Function → Finds the error.
+3.Backpropagation → Finds where the error is.
+4.Optimizer → Fixes the weights and bias.
+One-line note
+
+Optimizer is an algorithm that updates the model's weights and bias to reduce the prediction error during training.
+
+
+
+15. Learning Rate
+The learning rate controls how much the AI changes after each mistake.(It controls the speed of the AI learning.)
+
+ Example:
+ 
+ Learning Rate = 0.1 (Fast Learning)
+ → Large updates (Learns faster)
+ 
+ Learning Rate = 0.001 (Slow Learning)
+ → Small updates (Learns slower)
+ 
+ If the learning rate is too high:
+ - The AI may learn too quickly.
+ - It may overshoot the correct solution and make inaccurate predictions.
+ 
+ If the learning rate is too low:
+ - The AI learns very slowly.
+ - It takes more time to reach the correct solution.
+
+
+
+
+
+16.Epoch:-
+Epoch is the number of times the AI sees the entire dataset.
+Train full dataset once is one Epoch. Train full dataset 10 times is 10 Epochs.
+
+Example:-
+Epoch: 1000 Images
+   ↓
+After seeing all 1000 images once: Epoch: 1
+   ↓
+After repeating this 10 times: Epoch: 10
+
+Real-life analogy:-
+Imagine you're preparing for an exam.
+
+Book = Dataset
+
+Read the book once  → Epoch 1
+
+Read the book again → Epoch 2
+
+Read the book again → Epoch 3
+
+
+
+
+17.Training:-
+
+Training is the process of teaching the AI the relationship between the input and output.
+The AI repeats these steps many times:
+Input
+↓
+Prediction
+↓
+Calculate Loss
+↓
+Backpropagation
+↓
+Update Weights
+↓
+Repeat
+
+Eventually, the AI becomes better at the task.
+
+
+
+
+18.Validation / Testing:-
+Validation is the process of checking how well the AI is performing on the dataset.
+like a teacher checking the student's performance. if is learning properly or not.
+
+Example:-
+Traini the 100 Image
+   ↓
+Validation: New 100 Images 
+   ↓
+Predict the new 100 Images
+   ↓
+Check the accuracy of the new 100 Images
+   ↓
+If the accuracy is good, then the AI is learning properly.
+   ↓
+If the accuracy is not good, then the AI is not learning properly.
+   ↓
+Repeat the process until the AI is learning properly.
+
+
+
+19.Inference:-
+ UI for user side.Inference is the process of using the trained model to make a prediction.
+ Example:-
+ User Input: "I love AI"
+   ↓
+ Prediction: "I love AI because it helps people."
+   ↓
+ Output: "I love AI because it helps people."
+
+
+
+20.Fine-tuning:-
+Definition:-
+Fine-tuning is the process of taking a pre-trained AI model and training it on a smaller, specific dataset so it becomes better at a particular task or domain.
+
+Think of it as:
+Teach an already smart AI a new skill.
+
+
+
+21.Transformer:-
+Important Note:-
+Transformer is the architecture of the neural network.
+The Transformer is not a separate AI model. It is the architecture of the neural network.
+
+Example:-
+1.ChatGPT = AI Model
+2.Transformer = The architecture used to build ChatGPT
+3.A Transformer is a neural network architecture that processes all the words in a sentence together,
+learns their relationships, and generates accurate predictions.
+-Unlike older models, it doesn't read words strictly one by one. It can consider the whole sentence together.
+
+Real-life Analogy:-
+Imagine you're reading a sentence.
+  -The cat sat on the mat.
+
+You don't understand it by looking at only one word.
+Instead, you understand the whole sentence.
+A Transformer works in a similar way.
+
+
+Neural Network = General category.
+Transformer = One specific type of neural network.
+
+Example:-
+Neural Network
+│
+├── CNN (Images) -Convolutional Neural Network
+├── RNN (Sequential Data) -Recurrent Neural Network
+└── Transformer (Modern LLMs) -Transformer is the architecture of the neural network.
+
+
+
+
+22.Large Language Model (LLM):-
+
+Definition:-
+
+A Large Language Model (LLM) is a Transformer-based AI model trained on a huge amount of text data to understand and generate human language.
+1.It can understand and generate human language.
+2.All LLM models are Transformer-based.
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+Complete Flow of Concepts:- (AI Model)
+
+Data
+        ↓
+Dataset
+        ↓
+Tokenizer
+        ↓
+Tokens
+        ↓
+Token IDs
+        ↓
+Embeddings
+        ↓
+Neural Network (Transformer)
+        ↓
+Weights & Bias
+        ↓
+Forward Pass
+        ↓
+Prediction
+        ↓
+Loss Function
+        ↓
+Backpropagation
+        ↓
+Optimizer
+        ↓
+Update Weights & Bias
+        ↓
+Learning Rate
+        ↓
+Repeat (Epochs)
+        ↓
+Trained Model
+        ↓
+Fine-tuning (Optional)
+        ↓
+Large Language Model (LLM)
+        ↓
+Inference user input
+        ↓
+User Response = Output
+
+
+
