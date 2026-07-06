@@ -1,6 +1,13 @@
 from pathlib import Path
 
+from corpus import build_inventory_corpus
 from tokensizer import TokenizerWrapper, ids_to_tokens
+from scraper import scrape_website_to_file
+
+
+URL = "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-regatta-128-gb/p/itmdab5f9f1bf87b?pid=MOBHN974PMZMQ5HS&param=1228&BU=Mobile&pageUID=1783344201785"
+OUTPUT_DIR = Path(__file__).parent / "data" / "processed"
+CORPUS_DIR = Path(__file__).parent / "data" / "inventory_corpus"
 
 
 def main() -> None:
@@ -29,6 +36,13 @@ def main() -> None:
     print("Decoded text:", decoded_text)
     print("Vocabulary size:", tokenizer.vocabulary_size)
     print("Model path:", model_path)
+
+
+    output_path = scrape_website_to_file(URL, OUTPUT_DIR)
+    print(f"Saved scraped text to: {output_path}")
+
+    corpus_path = build_inventory_corpus(OUTPUT_DIR, CORPUS_DIR)
+    print(f"Saved corpus to: {corpus_path}")
 
 
 if __name__ == "__main__":
