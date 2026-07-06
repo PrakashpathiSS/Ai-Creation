@@ -1,8 +1,11 @@
-"""Basic text pre-tokenizers used by the learning tokenizer package."""
+"""Basic text pre-tokenizers used by the tokenizer package."""
 
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
+
+from .constants import UNK_TOKEN
 
 
 def character_tokenizer(text: str) -> list[str]:
@@ -36,18 +39,58 @@ def byte_level_tokenizer(text: str) -> list[str]:
     return [f"<0x{byte:02X}>" for byte in text.encode("utf-8")]
 
 
-def subword_level_tokenizer(text: str, chunk_size: int = 3) -> list[str]:
-    """Split words into small chunks."""
+def subword_level_tokenizer(
+    text: str,
+    vocabulary: Mapping[str, int] | set[str] | None = None,
+    continuation_prefix: str = "##",
+) -> list[str]:
+    """Split text into greedy subword pieces.
+
+    When a learned vocabulary is provided, the tokenizer performs a
+    longest-match search over each pre-tokenized word. Without a vocabulary,
+    it falls back to character pieces so the helper still behaves predictably
+    during smoke tests.
+    """
     tokens: list[str] = []
 
-    for word in whitespace_tokenizer(text):
-        if len(word) <= chunk_size:
-            tokens.append(word)
+    for word in word_tokenizer(text):
+        if not word:
             continue
 
-        tokens.append(word[:chunk_size])
-        for index in range(chunk_size, len(word), chunk_size):
-            tokens.append(f"##{word[index:index + chunk_size]}")
+        if vocabulary is None:
+            tokens.append(word[0])
+            tokens.extend(f"{continuation_prefix}{char}" for char in word[1:])
+            continue
+
+        start = 0
+        word_tokens: list[str] = []
+
+        while start < len(word):
+            end = len(word)
+            current_token = None
+
+            while start < end:
+                piece = word[start:end]
+                candidate = piece if start == 0 else f"{continuation_prefix}{piece}"
+                if candidate in vocabulary:
+                    current_token = candidate
+                    break
+                end -= 1
+
+            if current_token is None:
+                fallback_piece = word[start]
+                candidate = fallback_piece if start == 0 else f"{continuation_prefix}{fallback_piece}"
+                if candidate in vocabulary:
+                    current_token = candidate
+                    end = start + 1
+                else:
+                    word_tokens = [UNK_TOKEN]
+                    break
+
+            word_tokens.append(current_token)
+            start = end
+
+        tokens.extend(word_tokens)
 
     return tokens
 
