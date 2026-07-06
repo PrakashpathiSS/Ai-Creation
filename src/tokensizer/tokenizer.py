@@ -26,7 +26,7 @@ from .pretokenizers import (
     whitespace_tokenizer,
     word_tokenizer,
 )
-from .simple_tokenizer import SimpleTokenizer, TokenFunction
+from .tokenizer_wrapper import SimpleTokenizer, TokenFunction
 from .vocabulary import (
     base_vocabulary_tokens,
     build_vocabulary,
