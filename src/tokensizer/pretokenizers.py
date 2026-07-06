@@ -7,7 +7,7 @@ import re
 
 def character_tokenizer(text: str) -> list[str]:
     """Split text into single characters."""
-    return list[str](text)
+    return list(text)
 
 
 def whitespace_tokenizer(text: str) -> list[str]:

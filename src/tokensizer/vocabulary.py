@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from .constants import (
@@ -29,7 +29,12 @@ def base_vocabulary_tokens() -> list[str]:
     ]
 
 
-def validate_vocabulary(vocabulary: Mapping[str, int]) -> None:
+def validate_vocabulary(
+    vocabulary: Mapping[str, int],
+    *,
+    required_special_tokens: Sequence[str] = SPECIAL_TOKENS,
+    require_contiguous_ids: bool = True,
+) -> None:
     """Validate that a vocabulary can be safely used for encoding and decoding."""
     if not isinstance(vocabulary, Mapping):
         raise TypeError("Vocabulary must be a mapping of token strings to integer IDs.")
@@ -45,6 +50,19 @@ def validate_vocabulary(vocabulary: Mapping[str, int]) -> None:
         if token_id in ids:
             raise ValueError("Vocabulary IDs must be unique.")
         ids.add(token_id)
+
+    missing_special_tokens = [token for token in required_special_tokens if token not in vocabulary]
+    if missing_special_tokens:
+        raise ValueError(
+            "Vocabulary is missing required special tokens: "
+            + ", ".join(repr(token) for token in missing_special_tokens)
+        )
+
+    if require_contiguous_ids:
+        sorted_ids = sorted(ids)
+        expected_ids = list(range(len(sorted_ids)))
+        if sorted_ids != expected_ids:
+            raise ValueError("Vocabulary IDs must form a contiguous zero-based range.")
 
 
 def build_vocabulary(
@@ -62,7 +80,7 @@ def build_vocabulary(
         if token not in vocabulary:
             vocabulary[token] = len(vocabulary)
 
-    validate_vocabulary(vocabulary)
+    validate_vocabulary(vocabulary, required_special_tokens=special_tokens)
     return vocabulary
 
 

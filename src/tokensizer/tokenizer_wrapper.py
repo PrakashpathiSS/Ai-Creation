@@ -52,11 +52,23 @@ def _call_tokenizer(
     return tokenizer(text)
 
 
-def _combine_texts(texts: str | Iterable[str]) -> str:
-    """Normalize single strings and iterables of strings into one corpus string."""
+def _normalize_texts(texts: str | Iterable[str]) -> list[str]:
+    """Normalize a single string or iterable of strings into a list of texts."""
     if isinstance(texts, str):
-        return texts
-    return "\n".join(texts)
+        return [texts]
+    return list(texts)
+
+
+def _tokenize_corpus(
+    tokenizer: TokenFunction,
+    texts: str | Iterable[str],
+    vocabulary: Mapping[str, int] | set[str] | None = None,
+) -> list[str]:
+    """Tokenize one text or many texts while keeping corpus boundaries intact."""
+    tokens: list[str] = []
+    for text in _normalize_texts(texts):
+        tokens.extend(_call_tokenizer(tokenizer, text, vocabulary))
+    return tokens
 
 
 @dataclass
@@ -87,8 +99,12 @@ class TokenizerWrapper:
 
     def fit(self, texts: str | Iterable[str], reset: bool = False) -> dict[str, int]:
         """Learn a vocabulary from one text or a corpus of texts."""
-        corpus = _combine_texts(texts)
-        tokens = _call_tokenizer(self.training_tokenize or self.tokenize, corpus)
+        tokenizer = self.training_tokenize or self.tokenize
+        vocabulary_hint: Mapping[str, int] | set[str] | None = None
+        if self._tokenize_with_vocabulary and self.vocabulary:
+            vocabulary_hint = self.vocabulary
+
+        tokens = _tokenize_corpus(tokenizer, texts, vocabulary_hint)
 
         if reset or not self.vocabulary:
             self.vocabulary = build_vocabulary(tokens)
@@ -96,9 +112,19 @@ class TokenizerWrapper:
             self.vocabulary = extend_vocabulary(tokens, self.vocabulary)
         return self.vocabulary
 
-    def train(self, text: str, reset: bool = False) -> dict[str, int]:
+    def train(self, text: str | Iterable[str], reset: bool = False) -> dict[str, int]:
         """Backward-compatible wrapper around ``fit``."""
         return self.fit(text, reset=reset)
+
+    def fit_from_files(
+        self,
+        file_paths: Iterable[str | Path],
+        reset: bool = False,
+        encoding: str = "utf-8",
+    ) -> dict[str, int]:
+        """Train the tokenizer from a list of text files."""
+        texts = [Path(file_path).read_text(encoding=encoding) for file_path in file_paths]
+        return self.fit(texts, reset=reset)
 
     def pretrain(self) -> dict[str, int]:
         """Seed the vocabulary with a-z, A-Z, 0-9 and special characters."""
@@ -163,7 +189,7 @@ class TokenizerWrapper:
 
     def _tokenize(self, text: str) -> list[str]:
         if self._tokenize_with_vocabulary:
-            return _call_tokenizer(self.tokenize, text, set(self.vocabulary))
+            return _call_tokenizer(self.tokenize, text, self.vocabulary)
         return _call_tokenizer(self.tokenize, text)
 
 
