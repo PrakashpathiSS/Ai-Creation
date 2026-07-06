@@ -60,7 +60,7 @@ def _combine_texts(texts: str | Iterable[str]) -> str:
 
 
 @dataclass
-class SimpleTokenizer:
+class TokenizerWrapper:
     """A small trainable tokenizer for beginner AI experiments."""
 
     tokenize: TokenFunction = word_tokenizer
@@ -167,4 +167,4 @@ class SimpleTokenizer:
         return _call_tokenizer(self.tokenize, text)
 
 
-__all__ = ["TokenFunction", "SimpleTokenizer"]
+__all__ = ["TokenFunction", "TokenizerWrapper"]

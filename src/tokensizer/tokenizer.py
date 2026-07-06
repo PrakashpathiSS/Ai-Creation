@@ -26,7 +26,7 @@ from .pretokenizers import (
     whitespace_tokenizer,
     word_tokenizer,
 )
-from .tokenizer_wrapper import SimpleTokenizer, TokenFunction
+from .tokenizer_wrapper import TokenizerWrapper, TokenFunction
 from .vocabulary import (
     base_vocabulary_tokens,
     build_vocabulary,
@@ -52,7 +52,7 @@ __all__ = [
     "SPECIAL_CHARACTERS",
     "BYTE_TOKEN_PATTERN",
     "TokenFunction",
-    "SimpleTokenizer",
+    "TokenizerWrapper",
     "base_vocabulary_tokens",
     "bpe_tokenizer",
     "build_vocabulary",

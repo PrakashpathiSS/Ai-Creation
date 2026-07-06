@@ -2,13 +2,13 @@ from pathlib import Path
 from importlib import import_module
 
 from tokensizer import (
-    SimpleTokenizer,
     bpe_tokenizer,
     byte_level_tokenizer,
     character_tokenizer,
     regex_tokenizer,
     sentence_tokenizer,
     sentencepiece_tokenizer,
+    TokenizerWrapper,
     subword_level_tokenizer,
     unigram_tokenizer,
     whitespace_tokenizer,
@@ -52,7 +52,7 @@ def main() -> None:
 
     vocabulary_path = Path(__file__).parent / "tokensizer" / "vocabulary.json"
 
-    tokenizer = SimpleTokenizer(tokenize=word_tokenizer)
+    tokenizer = TokenizerWrapper(tokenize=word_tokenizer)
     if vocabulary_path.exists():
         tokenizer.load(vocabulary_path)
 
@@ -63,7 +63,7 @@ def main() -> None:
     token_ids = tokenizer.encode(user_text, add_special_tokens=True)
     decoded_text = tokenizer.decode(token_ids)
     tokenizer.save(vocabulary_path)
-    loaded_tokenizer = SimpleTokenizer(tokenize=word_tokenizer)
+    loaded_tokenizer = TokenizerWrapper(tokenize=word_tokenizer)
     loaded_vocabulary = loaded_tokenizer.load(vocabulary_path)
 
     print("\nOutput")
@@ -81,10 +81,10 @@ def main() -> None:
     print("WordPiece tokens:", wordpiece_tokenizer("tokenizer"))
     print("SentencePiece tokens:", sentencepiece_tokenizer(user_text))
     print("Unigram tokens:", unigram_tokenizer("tokenizer"))
-    # print("Vocabulary:", vocabulary)
+    print("Vocabulary:", vocabulary)
     print("Token IDs:", token_ids)
     print("Decoded text:", decoded_text)
-    # print("Saved vocabulary:", vocabulary_path)
+    print("Saved vocabulary:", vocabulary_path)
     print("Loaded vocabulary:", loaded_vocabulary)
     show_gpt_tokenizer_demo(user_text)
 
