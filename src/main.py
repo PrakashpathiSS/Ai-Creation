@@ -1,48 +1,30 @@
 from pathlib import Path
 
 from corpus import build_inventory_corpus
-from tokensizer import TokenizerWrapper, ids_to_tokens
+from dataset import build_tokenized_dataset
 from scraper import scrape_website_to_file
 
 
 URL = "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-regatta-128-gb/p/itmdab5f9f1bf87b?pid=MOBHN974PMZMQ5HS&param=1228&BU=Mobile&pageUID=1783344201785"
 OUTPUT_DIR = Path(__file__).parent / "data" / "processed"
 CORPUS_DIR = Path(__file__).parent / "data" / "inventory_corpus"
+DATASET_DIR = Path(__file__).parent / "data" / "dataset"
+TOKENIZER_MODEL_PATH = Path(__file__).parent / "tokensizer" / "tokenizer_model.json"
 
 
 def main() -> None:
-    user_text = input("Enter text to tokenize: ").strip()
-    model_path = Path(__file__).parent / "tokensizer" / "tokenizer_model.json"
-
-    tokenizer = TokenizerWrapper(target_vocab_size=2000, min_frequency=2)
-
-    if model_path.exists():
-        tokenizer.load(model_path)
-    else:
-        # This creates a starter model for local smoke tests.
-        # For production, train with your full corpus before saving.
-        tokenizer.fit(user_text, reset=True)
-        tokenizer.save(model_path)
-
-    subword_tokens = ids_to_tokens(tokenizer.encode(user_text), tokenizer.vocabulary)
-    token_ids = tokenizer.encode(user_text, add_special_tokens=True)
-    decoded_text = tokenizer.decode(token_ids)
-
-    print("\nTokenizer Output")
-    print("----------------")
-    print("Input text:", user_text)
-    print("Subword tokens:", subword_tokens)
-    print("Token IDs:", token_ids)
-    print("Decoded text:", decoded_text)
-    print("Vocabulary size:", tokenizer.vocabulary_size)
-    print("Model path:", model_path)
-
-
-    output_path = scrape_website_to_file(URL, OUTPUT_DIR)
-    print(f"Saved scraped text to: {output_path}")
+    scraped_path = scrape_website_to_file(URL, OUTPUT_DIR)
+    print(f"Saved scraped text to: {scraped_path}")
 
     corpus_path = build_inventory_corpus(OUTPUT_DIR, CORPUS_DIR)
     print(f"Saved corpus to: {corpus_path}")
+
+    dataset_path = build_tokenized_dataset(
+        corpus_path,
+        DATASET_DIR,
+        tokenizer_model_path=TOKENIZER_MODEL_PATH,
+    )
+    print(f"Saved tokenized dataset to: {dataset_path}")
 
 
 if __name__ == "__main__":
