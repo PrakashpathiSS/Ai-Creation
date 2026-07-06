@@ -9,11 +9,8 @@ from pathlib import Path
 
 from .constants import (
     BYTE_TOKEN_PATTERN,
-    BOS_TOKEN,
     DIGITS,
-    EOS_TOKEN,
     LOWERCASE_LETTERS,
-    PAD_TOKEN,
     SPECIAL_CHARACTERS,
     SPECIAL_TOKENS,
     SKIPPED_SPECIAL_TOKENS,
