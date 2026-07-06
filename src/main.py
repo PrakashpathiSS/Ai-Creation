@@ -5,7 +5,7 @@ from dataset import build_tokenized_dataset
 from scraper import scrape_website_to_file
 
 
-URL = "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-regatta-128-gb/p/itmdab5f9f1bf87b?pid=MOBHN974PMZMQ5HS&param=1228&BU=Mobile&pageUID=1783344201785"
+URL = "https://ascsoftware.com/features/inventory-management/"
 OUTPUT_DIR = Path(__file__).parent / "data" / "processed"
 CORPUS_DIR = Path(__file__).parent / "data" / "inventory_corpus"
 DATASET_DIR = Path(__file__).parent / "data" / "dataset"
