@@ -163,8 +163,19 @@ def detokenize(tokens: list[str]) -> str:
         byte_values = bytes(int(match.group(1), 16) for match in byte_matches if match is not None)
         return byte_values.decode("utf-8", errors="replace")
 
-    text = " ".join(filtered_tokens)
-    text = text.replace(" ##", "")
+    collapsed_tokens: list[str] = []
+    for token in filtered_tokens:
+        if token.startswith("##"):
+            continuation = token[len("##") :]
+            if collapsed_tokens:
+                collapsed_tokens[-1] += continuation
+            elif continuation:
+                collapsed_tokens.append(continuation)
+            continue
+
+        collapsed_tokens.append(token)
+
+    text = " ".join(collapsed_tokens)
     text = text.replace("▁", " ")
     text = re.sub(r"\s+([,.;:!?%])", r"\1", text)
     text = re.sub(r'([\(\[\{"\'])\s+', r"\1", text)
