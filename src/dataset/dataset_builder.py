@@ -12,9 +12,14 @@ DEFAULT_CORPUS_FILE = Path(__file__).resolve().parents[1] / "data" / "inventory_
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data" / "dataset"
 DEFAULT_OUTPUT_FILENAME = "inventory_tokenized_dataset.jsonl"
 DEFAULT_TOKENIZER_MODEL = Path(__file__).resolve().parents[1] / "tokensizer" / "tokenizer_model.json"
-DEFAULT_SEQUENCE_LENGTH = 128
-DEFAULT_STRIDE = 64
-DEFAULT_MIN_SEQUENCE_LENGTH = 2
+
+#They control how long each training chunk is, how much the next chunk overlaps, 
+# and when to skip chunks that are too small to learn from.
+
+
+DEFAULT_SEQUENCE_LENGTH = 128 # 128 +1 stores tokens for the input_ids & target_ids how long each chunk is
+DEFAULT_STRIDE = 64 #number of tokens to shift forward for the next chunk and start from the previous chunk
+DEFAULT_MIN_SEQUENCE_LENGTH = 2 # if sequence is less than 2, we skip it because it's too short no use
 
 
 def build_tokenized_dataset(
@@ -134,11 +139,8 @@ def _build_records(
             records.append(
                 {
                     "id": len(records),
-                    "document_index": document_index,
-                    "window_index": window_index,
                     "input_ids": window[:-1],
                     "target_ids": window[1:],
-                    "token_count": len(window),
                 }
             )
 
