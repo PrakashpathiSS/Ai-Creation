@@ -13,13 +13,9 @@ DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data" / "dataset"
 DEFAULT_OUTPUT_FILENAME = "inventory_tokenized_dataset.jsonl"
 DEFAULT_TOKENIZER_MODEL = Path(__file__).resolve().parents[1] / "tokensizer" / "tokenizer_model.json"
 
-#They control how long each training chunk is, how much the next chunk overlaps, 
-# and when to skip chunks that are too small to learn from.
-
-
-DEFAULT_SEQUENCE_LENGTH = 128 # 128 +1 stores tokens for the input_ids & target_ids how long each chunk is
-DEFAULT_STRIDE = 64 #number of tokens to shift forward for the next chunk and start from the previous chunk
-DEFAULT_MIN_SEQUENCE_LENGTH = 2 # if sequence is less than 2, we skip it because it's too short no use
+DEFAULT_SEQUENCE_LENGTH = 128  # Max tokens per training window, plus 1 for next-token labels.
+DEFAULT_STRIDE = 64  # Number of tokens to shift forward for the next window.
+DEFAULT_MIN_SEQUENCE_LENGTH = 2  # Skip chunks that are too short to learn from.
 
 
 def build_tokenized_dataset(
@@ -35,11 +31,9 @@ def build_tokenized_dataset(
 ) -> Path:
     """Convert the corpus into token ID input/target pairs.
 
-    Each dataset record stores:
+    Each dataset record stores only the mandatory training pair:
     - `input_ids`: token IDs for the model input
     - `target_ids`: the same sequence shifted by one token
-
-    This matches the training style used for next-token prediction models.
     """
     corpus_path = Path(corpus_file)
     if not corpus_path.exists():
@@ -127,18 +121,17 @@ def _build_records(
     records: list[dict[str, object]] = []
     max_window_size = sequence_length + 1
 
-    for document_index, document in enumerate(documents):
+    for document in documents:
         token_ids = tokenizer.encode(document)
         if len(token_ids) < min_sequence_length:
             continue
 
         windows = _build_windows(token_ids, max_window_size=max_window_size, stride=stride)
-        for window_index, window in enumerate(windows):
+        for window in windows:
             if len(window) < 2:
                 continue
             records.append(
                 {
-                    "id": len(records),
                     "input_ids": window[:-1],
                     "target_ids": window[1:],
                 }
