@@ -4,8 +4,8 @@ from corpus import build_inventory_corpus
 from dataset import build_tokenized_dataset, extract_input_ids_to_text
 from scraper import scrape_website_to_file
 from tokensizer import TokenizerWrapper, word_tokenizer, character_tokenizer, whitespace_tokenizer, sentence_tokenizer, regex_tokenizer, byte_level_tokenizer, subword_level_tokenizer, bpe_tokenizer, wordpiece_tokenizer, sentencepiece_tokenizer, unigram_tokenizer
-from training import create_dataloader
-
+from model import GPTConfig, GPTLanguageModel, load_vocab_size
+from training import TrainerConfig, create_dataloader, train_model
 URL = "https://ascsoftware.com/features/inventory-management/"
 OUTPUT_DIR = Path(__file__).parent / "data" / "processed"
 CORPUS_DIR = Path(__file__).parent / "data" / "inventory_corpus"
@@ -42,8 +42,38 @@ def main() -> None:
         seed=42,
     )
     first_batch = next(iter(train_loader))
-    print(first_batch["input_ids"][1])
-    print(first_batch["target_ids"][1])
+    # print("input_ids", first_batch["input_ids"][1])
+    # print("target_ids", first_batch["target_ids"][1])
+    # print("labels", first_batch["labels"])
+
+    vocab_size = load_vocab_size(TOKENIZER_MODEL_PATH)
+    model = GPTLanguageModel(
+        GPTConfig(
+            vocab_size=vocab_size,
+            context_length=first_batch["input_ids"].shape[1],
+        )
+    )
+    output = model(
+        first_batch["input_ids"],
+        attention_mask=first_batch["attention_mask"],
+        labels=first_batch["labels"],
+    )
+    logits = output["logits"]
+    loss = output["loss"]
+    if logits is None or loss is None:
+        raise ValueError("Model forward pass did not return logits and loss.")
+    print("model logits shape", logits.shape)
+    print("model loss", loss)
+
+    history = train_model(
+        model,
+        train_loader,
+        TrainerConfig(
+            epochs=1,
+            checkpoint_path=Path(__file__).parent / "checkpoints" / "gpt_inventory.pt",
+        ),
+    )
+    print("training history", history)
 
     # user_text = input("Enter text to tokenize: ").strip()
 
