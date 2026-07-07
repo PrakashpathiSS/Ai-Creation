@@ -132,8 +132,9 @@ def _build_records(
                 continue
             records.append(
                 {
-                    "input_ids": window[:-1],
-                    "target_ids": window[1:],
+                    "_id": len(records),
+                    "input_id": window[:-1],
+                    "target_id": window[1:],
                 }
             )
 
