@@ -40,6 +40,8 @@ def extract_input_ids_to_text(
     decoded_lines: list[str] = []
     for line_number, row in _read_jsonl(dataset_path):
         token_ids = row.get(token_field)
+        if token_ids is None and token_field == "input_ids":
+            token_ids = row.get("input_id")
         if not isinstance(token_ids, list):
             raise ValueError(
                 f"Row {line_number} is missing a list field named {token_field!r}."
@@ -47,9 +49,8 @@ def extract_input_ids_to_text(
 
         decoded_text = tokenizer.decode([int(token_id) for token_id in token_ids])
         if include_metadata:
-            row_id = row.get("id", line_number)
-            window_index = row.get("window_index", line_number)
-            decoded_lines.append(f"[id={row_id} window={window_index}] {decoded_text}")
+            row_id = row.get("_id", row.get("id", line_number))
+            decoded_lines.append(f"[id={row_id}] {decoded_text}")
         else:
             decoded_lines.append(decoded_text)
 
