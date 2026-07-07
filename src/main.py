@@ -4,6 +4,7 @@ from corpus import build_inventory_corpus
 from dataset import build_tokenized_dataset, extract_input_ids_to_text
 from scraper import scrape_website_to_file
 from tokensizer import TokenizerWrapper, word_tokenizer, character_tokenizer, whitespace_tokenizer, sentence_tokenizer, regex_tokenizer, byte_level_tokenizer, subword_level_tokenizer, bpe_tokenizer, wordpiece_tokenizer, sentencepiece_tokenizer, unigram_tokenizer
+from training import create_dataloader
 
 URL = "https://ascsoftware.com/features/inventory-management/"
 OUTPUT_DIR = Path(__file__).parent / "data" / "processed"
@@ -14,25 +15,35 @@ TOKENIZER_MODEL_PATH = Path(__file__).parent / "tokensizer" / "tokenizer_model.j
 
 
 def main() -> None:
-    scraped_path = scrape_website_to_file(URL, OUTPUT_DIR)
-    print(f"Saved scraped text to: {scraped_path}")
+    # scraped_path = scrape_website_to_file(URL, OUTPUT_DIR)
+    # print(f"Saved scraped text to: {scraped_path}")
 
-    corpus_path = build_inventory_corpus(OUTPUT_DIR, CORPUS_DIR)
-    print(f"Saved corpus to: {corpus_path}")
+    # corpus_path = build_inventory_corpus(OUTPUT_DIR, CORPUS_DIR)
+    # print(f"Saved corpus to: {corpus_path}")
 
-    dataset_path = build_tokenized_dataset(
-        corpus_path,
-        DATASET_DIR,
-        tokenizer_model_path=TOKENIZER_MODEL_PATH,
-    )
-    print(f"Saved tokenized dataset to: {dataset_path}")
+    # dataset_path = build_tokenized_dataset(
+    #     corpus_path,
+    #     DATASET_DIR,
+    #     tokenizer_model_path=TOKENIZER_MODEL_PATH,
+    # )
+    # print(f"Saved tokenized dataset to: {dataset_path}")
 
-    decoded_path = extract_input_ids_to_text(
+    # decoded_path = extract_input_ids_to_text(
+    #     DATASET_DIR / "inventory_tokenized_dataset.jsonl",
+    #     DECODED_DIR,
+    #     tokenizer_model_path=TOKENIZER_MODEL_PATH,
+    # )
+    # print(f"Saved decoded text to: {decoded_path}")
+
+    train_loader = create_dataloader(
         DATASET_DIR / "inventory_tokenized_dataset.jsonl",
-        DECODED_DIR,
-        tokenizer_model_path=TOKENIZER_MODEL_PATH,
+        batch_size=8,
+        shuffle=True,
+        seed=42,
     )
-    print(f"Saved decoded text to: {decoded_path}")
+    first_batch = next(iter(train_loader))
+    print(first_batch["input_ids"][1])
+    print(first_batch["target_ids"][1])
 
     # user_text = input("Enter text to tokenize: ").strip()
 
