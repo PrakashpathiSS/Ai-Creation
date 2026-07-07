@@ -177,6 +177,7 @@ def detokenize(tokens: list[str]) -> str:
 
     text = " ".join(collapsed_tokens)
     text = text.replace("▁", " ")
+    text = re.sub(r"\b(\w+)\s+'\s*(s|t|re|ve|ll|d|m)\b", r"\1'\2", text, flags=re.IGNORECASE)
     text = re.sub(r"\s+([,.;:!?%])", r"\1", text)
     text = re.sub(r'([\(\[\{"\'])\s+', r"\1", text)
     text = re.sub(r"\s+([)\]\}])", r"\1", text)

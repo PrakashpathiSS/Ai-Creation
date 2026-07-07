@@ -20,11 +20,17 @@ TokenFunction = Callable[..., list[str]]
 MODEL_VERSION = 1
 CONTINUATION_PREFIX = "##"
 BOUNDARY_MARKER = "</w>"
+APOSTROPHE_TRANSLATION = str.maketrans({
+    "’": "'",
+    "‘": "'",
+    "‛": "'",
+    "`": "'",
+})
 
 
 def _normalize_text(text: str, lowercase: bool) -> str:
     """Normalize text before training or encoding."""
-    normalized = unicodedata.normalize("NFKC", text)
+    normalized = unicodedata.normalize("NFKC", text).translate(APOSTROPHE_TRANSLATION)
     if lowercase:
         normalized = normalized.lower()
     normalized = re.sub(r"\s+", " ", normalized).strip()

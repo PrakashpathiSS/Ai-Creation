@@ -9,6 +9,12 @@ DEFAULT_SOURCE_DIR = Path(__file__).resolve().parents[1] / "data" / "processed"
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data" / "inventory_corpus"
 DEFAULT_OUTPUT_FILENAME = "inventory_corpus.txt"
 DEFAULT_SEPARATOR = "\n\n"
+APOSTROPHE_TRANSLATION = str.maketrans({
+    "’": "'",
+    "‘": "'",
+    "‛": "'",
+    "`": "'",
+})
 
 
 def build_inventory_corpus(
@@ -70,4 +76,5 @@ def _load_documents(text_files: list[Path]) -> list[str]:
 
 
 def _normalize_whitespace(text: str) -> str:
-    return re.sub(r"\s+", " ", text).strip()
+    normalized = text.translate(APOSTROPHE_TRANSLATION)
+    return re.sub(r"\s+", " ", normalized).strip()
