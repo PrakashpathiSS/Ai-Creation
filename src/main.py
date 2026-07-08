@@ -66,53 +66,53 @@ def main() -> None:
 
 
 
-    # train_loader = create_dataloader(
-    #     DATASET_DIR / "inventory_tokenized_dataset.jsonl",
-    #     batch_size=8,
-    #     shuffle=True,
-    #     seed=42,
-    # )
-    # first_batch = next(iter(train_loader))
+    train_loader = create_dataloader(
+        DATASET_DIR / "inventory_tokenized_dataset.jsonl",
+        batch_size=8,
+        shuffle=True,
+        seed=42,
+    )
+    first_batch = next(iter(train_loader))
     # print("input_ids", first_batch["input_ids"][1])
     # print("target_ids", first_batch["target_ids"][1])
     # print("labels", first_batch["labels"])
 
-    # vocab_size = load_vocab_size(TOKENIZER_MODEL_PATH)
-    # model = GPTLanguageModel(
-    #     GPTConfig(
-    #         vocab_size=vocab_size,
-    #         context_length=first_batch["input_ids"].shape[1],
-    #     )
-    # )
-    # output = model(
-    #     first_batch["input_ids"],
-    #     attention_mask=first_batch["attention_mask"],
-    #     labels=first_batch["labels"],
-    # )
-    # logits = output["logits"]
-    # loss = output["loss"]
-    # if logits is None or loss is None:
-    #     raise ValueError("Model forward pass did not return logits and loss.")
-    # print("model logits shape", logits.shape)
-    # print("model loss", loss)
-
-    # history = train_model(
-    #     model,
-    #     train_loader,
-    #     TrainerConfig(
-    #         epochs=30,
-    #         checkpoint_path=CHECKPOINT_PATH,
-    #     ),
-    # )
-    # print("training history", history)
-
-    generated_text = generate_text(
-        "Role of Inventory Logistics",
-        checkpoint_path=CHECKPOINT_PATH,
-        tokenizer_model_path=TOKENIZER_MODEL_PATH,
-        config=GenerationConfig(max_new_tokens=250, temperature=0.2, top_k=5),
+    vocab_size = load_vocab_size(TOKENIZER_MODEL_PATH)
+    model = GPTLanguageModel(
+        GPTConfig(
+            vocab_size=vocab_size,
+            context_length=first_batch["input_ids"].shape[1],
+        )
     )
-    print("generated text:------>", generated_text)
+    output = model(
+        first_batch["input_ids"],
+        attention_mask=first_batch["attention_mask"],
+        labels=first_batch["labels"],
+    )
+    logits = output["logits"]
+    loss = output["loss"]
+    if logits is None or loss is None:
+        raise ValueError("Model forward pass did not return logits and loss.")
+    print("model logits shape", logits.shape)
+    print("model loss", loss)
+
+    history = train_model(
+        model,
+        train_loader,
+        TrainerConfig(
+            epochs=45,
+            checkpoint_path=CHECKPOINT_PATH,
+        ),
+    )
+    print("training history", history)
+
+    # generated_text = generate_text(
+    #     "Role of Inventory Logistics",
+    #     checkpoint_path=CHECKPOINT_PATH,
+    #     tokenizer_model_path=TOKENIZER_MODEL_PATH,
+    #     config=GenerationConfig(max_new_tokens=250, temperature=0.2, top_k=5),
+    # )
+    # print("generated text:------>", generated_text)
 
 
 

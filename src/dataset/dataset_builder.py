@@ -28,6 +28,10 @@ def build_tokenized_dataset(
     stride: int = DEFAULT_STRIDE,
     min_sequence_length: int = DEFAULT_MIN_SEQUENCE_LENGTH,
     train_tokenizer_if_missing: bool = True,
+    force_retrain_tokenizer: bool = False,
+    tokenizer_target_vocab_size: int = 2000,
+    tokenizer_min_frequency: int = 2,
+    min_tokenizer_merges: int = 1,
 ) -> Path:
     """Convert the corpus into token ID input/target pairs.
 
@@ -43,6 +47,10 @@ def build_tokenized_dataset(
         tokenizer_model_path=tokenizer_model_path,
         corpus_path=corpus_path,
         train_tokenizer_if_missing=train_tokenizer_if_missing,
+        force_retrain_tokenizer=force_retrain_tokenizer,
+        target_vocab_size=tokenizer_target_vocab_size,
+        min_frequency=tokenizer_min_frequency,
+        min_merges=min_tokenizer_merges,
     )
 
     documents = _load_documents(corpus_path)
@@ -77,20 +85,39 @@ def _load_or_train_tokenizer(
     tokenizer_model_path: str | Path,
     corpus_path: Path,
     train_tokenizer_if_missing: bool,
+    force_retrain_tokenizer: bool,
+    target_vocab_size: int,
+    min_frequency: int,
+    min_merges: int,
 ) -> TokenizerWrapper:
-    tokenizer = TokenizerWrapper(target_vocab_size=2000, min_frequency=2)
+    tokenizer = TokenizerWrapper(
+        target_vocab_size=target_vocab_size,
+        min_frequency=min_frequency,
+    )
     model_path = Path(tokenizer_model_path)
 
-    if model_path.exists():
+    if model_path.exists() and not force_retrain_tokenizer:
         tokenizer.load(model_path)
-        return tokenizer
+        if _tokenizer_has_enough_merges(tokenizer, min_merges=min_merges):
+            return tokenizer
 
     if not train_tokenizer_if_missing:
+        if model_path.exists():
+            raise ValueError(
+                f"Tokenizer model has only {len(tokenizer.merges)} BPE merges; "
+                f"expected at least {min_merges}: {model_path}"
+            )
         raise FileNotFoundError(f"Tokenizer model does not exist: {model_path}")
 
     tokenizer.fit_from_files([corpus_path], reset=True)
     tokenizer.save(model_path)
     return tokenizer
+
+
+def _tokenizer_has_enough_merges(tokenizer: TokenizerWrapper, *, min_merges: int) -> bool:
+    if min_merges < 0:
+        raise ValueError("min_tokenizer_merges cannot be negative.")
+    return len(tokenizer.merges) >= min_merges
 
 
 def _load_documents(corpus_path: Path) -> list[str]:
