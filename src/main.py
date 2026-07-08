@@ -22,8 +22,16 @@ def main() -> None:
     # scraped_path = scrape_website_to_file(URL, OUTPUT_DIR)
     # print(f"Saved scraped text to: {scraped_path}")
 
+
+
+
+
     # corpus_path = build_inventory_corpus(OUTPUT_DIR, CORPUS_DIR)
     # print(f"Saved corpus to: {corpus_path}")
+
+
+
+
 
     # dataset_path = build_tokenized_dataset(
     #     corpus_path,
@@ -32,6 +40,10 @@ def main() -> None:
     # )
     # print(f"Saved tokenized dataset to: {dataset_path}")
 
+
+
+
+
     # decoded_path = extract_input_ids_to_text(
     #     DATASET_DIR / "inventory_tokenized_dataset.jsonl",
     #     DECODED_DIR,
@@ -39,10 +51,20 @@ def main() -> None:
     # )
     # print(f"Saved decoded text to: {decoded_path}")
 
-    pdf_text_paths = scrape_pdf_directory_to_files(PDF_SOURCE_DIR, OUTPUT_DIR)
-    print(f"Saved PDF text files: {len(pdf_text_paths)}")
-    for pdf_text_path in pdf_text_paths:
-        print(f" - {pdf_text_path}")
+
+
+
+    # pdf_text_paths = scrape_pdf_directory_to_files(PDF_SOURCE_DIR, OUTPUT_DIR)
+    # print(f"Saved PDF text files: {len(pdf_text_paths)}")
+    # for pdf_text_path in pdf_text_paths:
+    #     print(f" - {pdf_text_path}")
+
+
+
+
+
+
+
 
     # train_loader = create_dataloader(
     #     DATASET_DIR / "inventory_tokenized_dataset.jsonl",
@@ -78,19 +100,32 @@ def main() -> None:
     #     model,
     #     train_loader,
     #     TrainerConfig(
-    #         epochs=60,
+    #         epochs=30,
     #         checkpoint_path=CHECKPOINT_PATH,
     #     ),
     # )
     # print("training history", history)
 
-    # generated_text = generate_text(
-    #     "ASCTrac system",
-    #     checkpoint_path=CHECKPOINT_PATH,
-    #     tokenizer_model_path=TOKENIZER_MODEL_PATH,
-    #     config=GenerationConfig(max_new_tokens=40, temperature=0.9, top_k=20),
-    # )
-    # print("generated text:------>", generated_text)
+    generated_text = generate_text(
+        "Role of Inventory Logistics",
+        checkpoint_path=CHECKPOINT_PATH,
+        tokenizer_model_path=TOKENIZER_MODEL_PATH,
+        config=GenerationConfig(max_new_tokens=250, temperature=0.2, top_k=5),
+    )
+    print("generated text:------>", generated_text)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # user_text = input("Enter text to tokenize: ").strip()
 
