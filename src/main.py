@@ -4,7 +4,7 @@ from corpus import build_inventory_corpus
 from dataset import build_tokenized_dataset, extract_input_ids_to_text
 from inference import GenerationConfig, generate_text
 from model import GPTConfig, GPTLanguageModel, load_vocab_size
-from scraper import scrape_website_to_file
+from scraper import DEFAULT_RAW_DIR, DEFAULT_RAW_PDF_DIR, scrape_pdf_directory_to_files, scrape_website_to_file
 from tokensizer import TokenizerWrapper, word_tokenizer, character_tokenizer, whitespace_tokenizer, sentence_tokenizer, regex_tokenizer, byte_level_tokenizer, subword_level_tokenizer, bpe_tokenizer, wordpiece_tokenizer, sentencepiece_tokenizer, unigram_tokenizer
 from training import TrainerConfig, create_dataloader, train_model
 
@@ -15,6 +15,7 @@ DATASET_DIR = Path(__file__).parent / "data" / "dataset"
 DECODED_DIR = Path(__file__).parent / "data" / "decoded"
 TOKENIZER_MODEL_PATH = Path(__file__).parent / "tokensizer" / "tokenizer_model.json"
 CHECKPOINT_PATH = Path(__file__).parent / "checkpoints" / "gpt_inventory.pt"
+PDF_SOURCE_DIR = DEFAULT_RAW_PDF_DIR if DEFAULT_RAW_PDF_DIR.exists() else DEFAULT_RAW_DIR
 
 
 def main() -> None:
@@ -38,53 +39,58 @@ def main() -> None:
     # )
     # print(f"Saved decoded text to: {decoded_path}")
 
-    train_loader = create_dataloader(
-        DATASET_DIR / "inventory_tokenized_dataset.jsonl",
-        batch_size=8,
-        shuffle=True,
-        seed=42,
-    )
-    first_batch = next(iter(train_loader))
+    pdf_text_paths = scrape_pdf_directory_to_files(PDF_SOURCE_DIR, OUTPUT_DIR)
+    print(f"Saved PDF text files: {len(pdf_text_paths)}")
+    for pdf_text_path in pdf_text_paths:
+        print(f" - {pdf_text_path}")
+
+    # train_loader = create_dataloader(
+    #     DATASET_DIR / "inventory_tokenized_dataset.jsonl",
+    #     batch_size=8,
+    #     shuffle=True,
+    #     seed=42,
+    # )
+    # first_batch = next(iter(train_loader))
     # print("input_ids", first_batch["input_ids"][1])
     # print("target_ids", first_batch["target_ids"][1])
     # print("labels", first_batch["labels"])
 
-    vocab_size = load_vocab_size(TOKENIZER_MODEL_PATH)
-    model = GPTLanguageModel(
-        GPTConfig(
-            vocab_size=vocab_size,
-            context_length=first_batch["input_ids"].shape[1],
-        )
-    )
-    output = model(
-        first_batch["input_ids"],
-        attention_mask=first_batch["attention_mask"],
-        labels=first_batch["labels"],
-    )
-    logits = output["logits"]
-    loss = output["loss"]
-    if logits is None or loss is None:
-        raise ValueError("Model forward pass did not return logits and loss.")
-    print("model logits shape", logits.shape)
-    print("model loss", loss)
+    # vocab_size = load_vocab_size(TOKENIZER_MODEL_PATH)
+    # model = GPTLanguageModel(
+    #     GPTConfig(
+    #         vocab_size=vocab_size,
+    #         context_length=first_batch["input_ids"].shape[1],
+    #     )
+    # )
+    # output = model(
+    #     first_batch["input_ids"],
+    #     attention_mask=first_batch["attention_mask"],
+    #     labels=first_batch["labels"],
+    # )
+    # logits = output["logits"]
+    # loss = output["loss"]
+    # if logits is None or loss is None:
+    #     raise ValueError("Model forward pass did not return logits and loss.")
+    # print("model logits shape", logits.shape)
+    # print("model loss", loss)
 
-    history = train_model(
-        model,
-        train_loader,
-        TrainerConfig(
-            epochs=60,
-            checkpoint_path=CHECKPOINT_PATH,
-        ),
-    )
-    print("training history", history)
+    # history = train_model(
+    #     model,
+    #     train_loader,
+    #     TrainerConfig(
+    #         epochs=60,
+    #         checkpoint_path=CHECKPOINT_PATH,
+    #     ),
+    # )
+    # print("training history", history)
 
-    generated_text = generate_text(
-        "ASCTrac system",
-        checkpoint_path=CHECKPOINT_PATH,
-        tokenizer_model_path=TOKENIZER_MODEL_PATH,
-        config=GenerationConfig(max_new_tokens=40, temperature=0.9, top_k=20),
-    )
-    print("generated text:------>", generated_text)
+    # generated_text = generate_text(
+    #     "ASCTrac system",
+    #     checkpoint_path=CHECKPOINT_PATH,
+    #     tokenizer_model_path=TOKENIZER_MODEL_PATH,
+    #     config=GenerationConfig(max_new_tokens=40, temperature=0.9, top_k=20),
+    # )
+    # print("generated text:------>", generated_text)
 
     # user_text = input("Enter text to tokenize: ").strip()
 
