@@ -18,12 +18,15 @@ class TrainerConfig:
     device: str = "auto"
     log_every: int = 10
     checkpoint_path: str | Path | None = None
+    resume_from_checkpoint: str | Path | None = None
 
 
 def train_model(
     model: Any,
     dataloader: Any,
     config: TrainerConfig | None = None,
+    *,
+    validation_dataloader: Any | None = None,
 ) -> list[dict[str, float]]:
     """Train the model for one or more epochs and return epoch metrics."""
     torch = _require_torch()
@@ -39,8 +42,18 @@ def train_model(
         weight_decay=config.weight_decay,
     )
 
+    start_epoch = 1
+    if config.resume_from_checkpoint is not None:
+        checkpoint = load_checkpoint(config.resume_from_checkpoint, device=device)
+        _validate_resume_config(model, checkpoint, config.resume_from_checkpoint)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer_state = checkpoint.get("optimizer_state_dict")
+        if optimizer_state is not None:
+            optimizer.load_state_dict(optimizer_state)
+        start_epoch = int(checkpoint.get("epoch", 0)) + 1
+
     history: list[dict[str, float]] = []
-    for epoch in range(1, config.epochs + 1):
+    for epoch in range(start_epoch, start_epoch + config.epochs):
         metrics = train_one_epoch(
             model,
             dataloader,
@@ -50,6 +63,14 @@ def train_model(
             log_every=config.log_every,
         )
         metrics["epoch"] = float(epoch)
+        if validation_dataloader is not None:
+            validation_metrics = evaluate_model(
+                model,
+                validation_dataloader,
+                device=device,
+            )
+            metrics["validation_loss"] = validation_metrics["loss"]
+            metrics["validation_steps"] = validation_metrics["steps"]
         history.append(metrics)
 
         if config.checkpoint_path is not None:
@@ -59,6 +80,7 @@ def train_model(
                 config.checkpoint_path,
                 epoch=epoch,
                 loss=metrics["loss"],
+                validation_loss=metrics.get("validation_loss"),
             )
 
     return history
@@ -109,6 +131,38 @@ def train_one_epoch(
     return {"loss": total_loss / total_steps, "steps": float(total_steps)}
 
 
+def evaluate_model(
+    model: Any,
+    dataloader: Any,
+    *,
+    device: Any,
+) -> dict[str, float]:
+    """Evaluate average loss over a DataLoader without updating weights."""
+    torch = _require_torch()
+    model.eval()
+
+    total_loss = 0.0
+    total_steps = 0
+    with torch.no_grad():
+        for batch in dataloader:
+            input_ids = _batch_get(batch, "input_ids").to(device)
+            labels = _batch_get(batch, "labels").to(device)
+            attention_mask = _batch_get(batch, "attention_mask").to(device)
+
+            output = model(input_ids, attention_mask=attention_mask, labels=labels)
+            loss = output.get("loss") if isinstance(output, dict) else output.loss
+            if loss is None:
+                raise ValueError("Model output must contain a loss when labels are provided.")
+
+            total_loss += float(loss.detach().cpu().item())
+            total_steps += 1
+
+    if total_steps == 0:
+        raise ValueError("The validation DataLoader did not yield any batches.")
+
+    return {"loss": total_loss / total_steps, "steps": float(total_steps)}
+
+
 def save_checkpoint(
     model: Any,
     optimizer: Any,
@@ -116,6 +170,7 @@ def save_checkpoint(
     *,
     epoch: int,
     loss: float,
+    validation_loss: float | None = None,
 ) -> Path:
     """Save model and optimizer state to disk."""
     torch = _require_torch()
@@ -125,6 +180,7 @@ def save_checkpoint(
         {
             "epoch": epoch,
             "loss": loss,
+            "validation_loss": validation_loss,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "model_config": _serialize_model_config(getattr(model, "config", None)),
@@ -132,6 +188,48 @@ def save_checkpoint(
         path,
     )
     return path
+
+
+def load_checkpoint(checkpoint_path: str | Path, *, device: Any | None = None) -> dict[str, Any]:
+    """Load a training checkpoint dictionary."""
+    torch = _require_torch()
+    path = Path(checkpoint_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Checkpoint does not exist: {path}")
+
+    map_location = device if device is not None else "cpu"
+    try:
+        checkpoint = torch.load(path, map_location=map_location, weights_only=True)
+    except TypeError:
+        checkpoint = torch.load(path, map_location=map_location)
+    except Exception:
+        try:
+            checkpoint = torch.load(path, map_location=map_location, weights_only=False)
+        except TypeError:
+            checkpoint = torch.load(path, map_location=map_location)
+
+    if not isinstance(checkpoint, dict):
+        raise ValueError(f"Checkpoint must contain a dictionary: {path}")
+    if "model_state_dict" not in checkpoint:
+        raise ValueError(f"Checkpoint is missing model_state_dict: {path}")
+    return checkpoint
+
+
+def _validate_resume_config(model: Any, checkpoint: dict[str, Any], checkpoint_path: str | Path) -> None:
+    saved_config = checkpoint.get("model_config")
+    if is_dataclass(saved_config):
+        saved_config = asdict(saved_config)
+
+    current_config = _serialize_model_config(getattr(model, "config", None))
+    if saved_config is None or current_config is None:
+        return
+    if saved_config != current_config:
+        raise ValueError(
+            "Checkpoint model_config does not match the current model. "
+            f"Checkpoint: {checkpoint_path}. "
+            f"Saved config: {saved_config}. "
+            f"Current config: {current_config}."
+        )
 
 
 def _serialize_model_config(config: Any) -> Any:
@@ -170,6 +268,8 @@ def _require_torch() -> Any:
 
 __all__ = [
     "TrainerConfig",
+    "evaluate_model",
+    "load_checkpoint",
     "save_checkpoint",
     "train_model",
     "train_one_epoch",

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass, is_dataclass
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,10 @@ class GenerationConfig:
     max_new_tokens: int = 60
     temperature: float = 0.9
     top_k: int | None = 20
+    top_p: float | None = 0.9
+    repetition_penalty: float = 1.1
+    no_repeat_ngram_size: int = 3
+    trim_incomplete_sentence: bool = True
     device: str = "auto"
 
 
@@ -50,10 +55,30 @@ def generate_text(
         max_new_tokens=config.max_new_tokens,
         temperature=config.temperature,
         top_k=config.top_k,
+        top_p=config.top_p,
+        repetition_penalty=config.repetition_penalty,
+        no_repeat_ngram_size=config.no_repeat_ngram_size,
         eos_token_id=tokenizer.vocabulary.get("<EOS>"),
     )
 
-    return tokenizer.decode(generated_ids[0].detach().cpu().tolist())
+    decoded_text = tokenizer.decode(generated_ids[0].detach().cpu().tolist())
+    if config.trim_incomplete_sentence:
+        return _trim_incomplete_sentence(decoded_text, prompt)
+    return decoded_text
+
+
+def _trim_incomplete_sentence(text: str, prompt: str) -> str:
+    """Remove a dangling final fragment while keeping the prompt intact."""
+    if text.rstrip().endswith((".", "!", "?")):
+        return text.strip()
+
+    prompt_end = max(len(prompt.strip()), 1)
+    matches = list(re.finditer(r"[.!?](?:\s|$)", text))
+    usable_matches = [match for match in matches if match.end() > prompt_end]
+    if not usable_matches:
+        return text.strip()
+
+    return text[: usable_matches[-1].end()].strip()
 
 
 def load_model_from_checkpoint(

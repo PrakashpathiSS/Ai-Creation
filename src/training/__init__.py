@@ -7,8 +7,16 @@ from .dataloader import (
     build_dataloader,
     collate_tokenized_batch,
     create_dataloader,
+    create_train_validation_dataloaders,
 )
-from .trainer import TrainerConfig, save_checkpoint, train_model, train_one_epoch
+from .trainer import (
+    TrainerConfig,
+    evaluate_model,
+    load_checkpoint,
+    save_checkpoint,
+    train_model,
+    train_one_epoch,
+)
 
 __all__ = [
     "InventoryTokenizedDataset",
@@ -18,6 +26,9 @@ __all__ = [
     "build_dataloader",
     "collate_tokenized_batch",
     "create_dataloader",
+    "create_train_validation_dataloaders",
+    "evaluate_model",
+    "load_checkpoint",
     "save_checkpoint",
     "train_model",
     "train_one_epoch",

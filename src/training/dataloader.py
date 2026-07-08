@@ -140,6 +140,78 @@ def create_dataloader(
     )
 
 
+def create_train_validation_dataloaders(
+    dataset_file: str | Path = DEFAULT_DATASET_FILE,
+    *,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    validation_fraction: float = 0.1,
+    shuffle_train: bool = True,
+    drop_last: bool = False,
+    num_workers: int = 0,
+    pin_memory: bool = False,
+    pad_token_id: int = DEFAULT_PAD_TOKEN_ID,
+    label_pad_token_id: int = DEFAULT_LABEL_PAD_TOKEN_ID,
+    seed: int | None = None,
+) -> tuple[Any, Any]:
+    """Create train and validation DataLoaders from one tokenized dataset."""
+    if batch_size < 1:
+        raise ValueError("batch_size must be at least 1.")
+    if not 0 < validation_fraction < 1:
+        raise ValueError("validation_fraction must be between 0 and 1.")
+    if num_workers < 0:
+        raise ValueError("num_workers cannot be negative.")
+
+    torch = _require_torch()
+    dataloader_class = _require_torch_dataloader()
+    dataset = InventoryTokenizedDataset(dataset_file)
+    if len(dataset) < 2:
+        raise ValueError("At least two samples are required for a train/validation split.")
+
+    validation_size = max(1, int(len(dataset) * validation_fraction))
+    training_size = len(dataset) - validation_size
+    if training_size < 1:
+        raise ValueError("The validation split leaves no samples for training.")
+
+    split_generator = None
+    train_generator = None
+    if seed is not None:
+        split_generator = torch.Generator()
+        split_generator.manual_seed(seed)
+        train_generator = torch.Generator()
+        train_generator.manual_seed(seed)
+
+    training_dataset, validation_dataset = torch.utils.data.random_split(
+        dataset,
+        [training_size, validation_size],
+        generator=split_generator,
+    )
+    collate_fn = build_collate_fn(
+        pad_token_id=pad_token_id,
+        label_pad_token_id=label_pad_token_id,
+    )
+
+    train_loader = dataloader_class(
+        training_dataset,
+        batch_size=batch_size,
+        shuffle=shuffle_train,
+        drop_last=drop_last,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        generator=train_generator,
+        collate_fn=collate_fn,
+    )
+    validation_loader = dataloader_class(
+        validation_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        drop_last=False,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        collate_fn=collate_fn,
+    )
+    return train_loader, validation_loader
+
+
 def build_dataloader(*args: Any, **kwargs: Any) -> Any:
     """Alias for ``create_dataloader``."""
     return create_dataloader(*args, **kwargs)
@@ -272,4 +344,5 @@ __all__ = [
     "build_dataloader",
     "collate_tokenized_batch",
     "create_dataloader",
+    "create_train_validation_dataloaders",
 ]

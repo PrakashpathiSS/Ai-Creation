@@ -120,6 +120,9 @@ class GPTLanguageModel(nn.Module):
         max_new_tokens: int = 50,
         temperature: float = 1.0,
         top_k: int | None = None,
+        top_p: float | None = None,
+        repetition_penalty: float = 1.0,
+        no_repeat_ngram_size: int = 0,
         eos_token_id: int | None = None,
     ) -> torch.Tensor:
         """Generate token IDs autoregressively from a prompt."""
@@ -127,12 +130,28 @@ class GPTLanguageModel(nn.Module):
             return input_ids
         if temperature <= 0:
             raise ValueError("temperature must be greater than 0.")
+        if top_p is not None and not 0 < top_p <= 1:
+            raise ValueError("top_p must be between 0 and 1 when provided.")
+        if repetition_penalty < 1:
+            raise ValueError("repetition_penalty must be at least 1.")
+        if no_repeat_ngram_size < 0:
+            raise ValueError("no_repeat_ngram_size cannot be negative.")
 
         generated = input_ids
         for _ in range(max_new_tokens):
             context = generated[:, -self.config.context_length :]
             output = self(context)
             next_token_logits = output["logits"][:, -1, :] / temperature
+            next_token_logits = _apply_repetition_penalty(
+                next_token_logits,
+                generated,
+                repetition_penalty=repetition_penalty,
+            )
+            next_token_logits = _apply_no_repeat_ngram_mask(
+                next_token_logits,
+                generated,
+                no_repeat_ngram_size=no_repeat_ngram_size,
+            )
 
             if top_k is not None:
                 top_k = min(top_k, next_token_logits.size(-1))
@@ -141,6 +160,9 @@ class GPTLanguageModel(nn.Module):
                     next_token_logits < values[:, [-1]],
                     torch.finfo(next_token_logits.dtype).min,
                 )
+
+            if top_p is not None:
+                next_token_logits = _apply_top_p_filter(next_token_logits, top_p=top_p)
 
             probabilities = torch.softmax(next_token_logits, dim=-1)
             next_token = torch.multinomial(probabilities, num_samples=1)
@@ -173,3 +195,68 @@ def load_vocab_size(tokenizer_model_path: str | Path) -> int:
         raise ValueError(f"Tokenizer model is missing a vocabulary object: {path}")
 
     return len(vocabulary)
+
+
+def _apply_repetition_penalty(
+    logits: torch.Tensor,
+    generated: torch.Tensor,
+    *,
+    repetition_penalty: float,
+) -> torch.Tensor:
+    if repetition_penalty == 1:
+        return logits
+
+    adjusted_logits = logits.clone()
+    for batch_index in range(generated.size(0)):
+        token_ids = torch.unique(generated[batch_index])
+        token_logits = adjusted_logits[batch_index, token_ids]
+        adjusted_logits[batch_index, token_ids] = torch.where(
+            token_logits < 0,
+            token_logits * repetition_penalty,
+            token_logits / repetition_penalty,
+        )
+    return adjusted_logits
+
+
+def _apply_no_repeat_ngram_mask(
+    logits: torch.Tensor,
+    generated: torch.Tensor,
+    *,
+    no_repeat_ngram_size: int,
+) -> torch.Tensor:
+    if no_repeat_ngram_size <= 1 or generated.size(1) + 1 < no_repeat_ngram_size:
+        return logits
+
+    masked_logits = logits.clone()
+    for batch_index in range(generated.size(0)):
+        token_ids = generated[batch_index].tolist()
+        prefix = tuple(token_ids[-(no_repeat_ngram_size - 1) :])
+        banned_tokens: set[int] = set()
+        for start in range(0, len(token_ids) - no_repeat_ngram_size + 1):
+            ngram = tuple(token_ids[start : start + no_repeat_ngram_size])
+            if ngram[:-1] == prefix:
+                banned_tokens.add(ngram[-1])
+        if banned_tokens:
+            masked_logits[batch_index, list(banned_tokens)] = torch.finfo(logits.dtype).min
+    return masked_logits
+
+
+def _apply_top_p_filter(logits: torch.Tensor, *, top_p: float) -> torch.Tensor:
+    sorted_logits, sorted_indices = torch.sort(logits, descending=True, dim=-1)
+    sorted_probabilities = torch.softmax(sorted_logits, dim=-1)
+    cumulative_probabilities = torch.cumsum(sorted_probabilities, dim=-1)
+
+    sorted_indices_to_remove = cumulative_probabilities > top_p
+    sorted_indices_to_remove[:, 1:] = sorted_indices_to_remove[:, :-1].clone()
+    sorted_indices_to_remove[:, 0] = False
+
+    filtered_logits = logits.clone()
+    filtered_logits.scatter_(
+        dim=-1,
+        index=sorted_indices,
+        src=sorted_logits.masked_fill(
+            sorted_indices_to_remove,
+            torch.finfo(logits.dtype).min,
+        ),
+    )
+    return filtered_logits
