@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, is_dataclass
 from pathlib import Path
 from typing import Any
 
@@ -127,11 +127,17 @@ def save_checkpoint(
             "loss": loss,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
-            "model_config": getattr(model, "config", None),
+            "model_config": _serialize_model_config(getattr(model, "config", None)),
         },
         path,
     )
     return path
+
+
+def _serialize_model_config(config: Any) -> Any:
+    if is_dataclass(config):
+        return asdict(config)
+    return config
 
 
 def _batch_get(batch: Any, key: str) -> Any:

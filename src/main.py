@@ -2,16 +2,19 @@ from pathlib import Path
 
 from corpus import build_inventory_corpus
 from dataset import build_tokenized_dataset, extract_input_ids_to_text
+from inference import GenerationConfig, generate_text
+from model import GPTConfig, GPTLanguageModel, load_vocab_size
 from scraper import scrape_website_to_file
 from tokensizer import TokenizerWrapper, word_tokenizer, character_tokenizer, whitespace_tokenizer, sentence_tokenizer, regex_tokenizer, byte_level_tokenizer, subword_level_tokenizer, bpe_tokenizer, wordpiece_tokenizer, sentencepiece_tokenizer, unigram_tokenizer
-from model import GPTConfig, GPTLanguageModel, load_vocab_size
 from training import TrainerConfig, create_dataloader, train_model
+
 URL = "https://ascsoftware.com/features/inventory-management/"
 OUTPUT_DIR = Path(__file__).parent / "data" / "processed"
 CORPUS_DIR = Path(__file__).parent / "data" / "inventory_corpus"
 DATASET_DIR = Path(__file__).parent / "data" / "dataset"
 DECODED_DIR = Path(__file__).parent / "data" / "decoded"
 TOKENIZER_MODEL_PATH = Path(__file__).parent / "tokensizer" / "tokenizer_model.json"
+CHECKPOINT_PATH = Path(__file__).parent / "checkpoints" / "gpt_inventory.pt"
 
 
 def main() -> None:
@@ -69,11 +72,19 @@ def main() -> None:
         model,
         train_loader,
         TrainerConfig(
-            epochs=1,
-            checkpoint_path=Path(__file__).parent / "checkpoints" / "gpt_inventory.pt",
+            epochs=60,
+            checkpoint_path=CHECKPOINT_PATH,
         ),
     )
     print("training history", history)
+
+    generated_text = generate_text(
+        "ASCTrac system",
+        checkpoint_path=CHECKPOINT_PATH,
+        tokenizer_model_path=TOKENIZER_MODEL_PATH,
+        config=GenerationConfig(max_new_tokens=40, temperature=0.9, top_k=20),
+    )
+    print("generated text:------>", generated_text)
 
     # user_text = input("Enter text to tokenize: ").strip()
 

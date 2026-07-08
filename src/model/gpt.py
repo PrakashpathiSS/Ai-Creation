@@ -15,7 +15,7 @@ from .embeddings import TokenEmbedding
 from .positional import PositionalEmbedding
 from .transformer import TransformerBlock
 
-
+#nn newral network
 @dataclass(frozen=True)
 class GPTConfig:
     """Configuration for the small GPT model."""
