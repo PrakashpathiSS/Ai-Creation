@@ -124,7 +124,7 @@ def main() -> None:
     #     model,
     #     train_loader,
     #     TrainerConfig(
-    #         epochs=45,
+    #         epochs=150,
     #         checkpoint_path=CHECKPOINT_PATH,
     #         resume_from_checkpoint=resume_checkpoint,
     #     ),
@@ -133,11 +133,11 @@ def main() -> None:
     # print("training history", history)
 
     generated_text = generate_text(
-        "Inventory management is",
+        "ASCTrac offers a unified",
         checkpoint_path=CHECKPOINT_PATH,
         tokenizer_model_path=TOKENIZER_MODEL_PATH,
         config=GenerationConfig(
-            max_new_tokens=50,
+            max_new_tokens=120,
             temperature=0.45,
             top_k=10,
             top_p=0.8,

@@ -15,14 +15,14 @@ from tokensizer import TokenizerWrapper
 class GenerationConfig:
     """Configuration for text generation."""
 
-    max_new_tokens: int = 60
-    temperature: float = 0.9
-    top_k: int | None = 20
-    top_p: float | None = 0.9
-    repetition_penalty: float = 1.1
-    no_repeat_ngram_size: int = 3
-    trim_incomplete_sentence: bool = True
-    device: str = "auto"
+    max_new_tokens: int = 60  # Maximum new tokens to generate after the prompt.
+    temperature: float = 0.9  # Randomness level; lower is safer, higher is more creative.
+    top_k: int | None = 20  # Only sample from the top K likely next tokens.
+    top_p: float | None = 0.9  # Only sample from tokens inside this probability mass.
+    repetition_penalty: float = 1.1  # Penalizes already-used tokens to reduce loops.
+    no_repeat_ngram_size: int = 3  # Blocks repeated token phrases of this size.
+    trim_incomplete_sentence: bool = True  # Removes unfinished final sentence fragments.
+    device: str = "auto"  # Uses GPU/MPS when available, otherwise CPU.
 
 
 def generate_text(

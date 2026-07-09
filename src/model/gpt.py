@@ -20,14 +20,14 @@ from .transformer import TransformerBlock
 class GPTConfig:
     """Configuration for the small GPT model."""
 
-    vocab_size: int
-    context_length: int = 128
-    embedding_dim: int = 128
-    num_layers: int = 2
-    num_heads: int = 4
-    dropout: float = 0.1
-    pad_token_id: int = 0
-    label_ignore_index: int = -100
+    vocab_size: int  # Total tokens known by the tokenizer.
+    context_length: int = 256  # How many previous tokens the model can read.
+    embedding_dim: int = 256  # Vector size used to represent each token.
+    num_layers: int = 4  # Number of transformer blocks in the model.
+    num_heads: int = 8  # Number of attention views inside each block.
+    dropout: float = 0.1  # Randomly drops activations during training to reduce overfitting.
+    pad_token_id: int = 0  # Token ID used for padding shorter sequences.
+    label_ignore_index: int = -100  # Label value ignored when calculating loss.
 
 
 class GPTLanguageModel(nn.Module):
